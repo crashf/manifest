@@ -215,7 +215,6 @@ interface HealedReforwardContext {
   tenantProviderId: string | null;
 }
 
-
 // --- per-tier/per-provider stream warmup overrides ---
 const warmupCache = new Map<string, number | null>();
 const WARMUP_CACHE_TTL_MS = 60_000;
@@ -267,7 +266,9 @@ export class ProxyService {
           warmupCache.set(key, ms);
           setTimeout(() => warmupCache.delete(key), WARMUP_CACHE_TTL_MS).unref?.();
           if (ms) {
-            this.logger.log(`Stream warmup override applied: source=header_tier id=${headerTierId} ms=${ms}`);
+            this.logger.log(
+              `Stream warmup override applied: source=header_tier id=${headerTierId} ms=${ms}`,
+            );
             return ms;
           }
         }
@@ -288,7 +289,9 @@ export class ProxyService {
           warmupCache.set(key, ms);
           setTimeout(() => warmupCache.delete(key), WARMUP_CACHE_TTL_MS).unref?.();
           if (ms) {
-            this.logger.log(`Stream warmup override applied: source=provider name=${provider} ms=${ms}`);
+            this.logger.log(
+              `Stream warmup override applied: source=provider name=${provider} ms=${ms}`,
+            );
             return ms;
           }
         }

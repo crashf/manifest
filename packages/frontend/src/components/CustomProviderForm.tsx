@@ -188,7 +188,7 @@ const CustomProviderForm: Component<Props> = (props) => {
   const handleUpdate = async () => {
     setError(null);
     const warmRaw = streamWarmupMs().trim();
-    const warm = warmRaw === "" ? null : Math.round(Number(warmRaw));
+    const warm = warmRaw === '' ? null : Math.round(Number(warmRaw));
     const data: Record<string, unknown> = {
       name: name().trim(),
       alias: normalizedAlias(),
