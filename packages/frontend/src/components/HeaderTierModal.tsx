@@ -176,6 +176,19 @@ const HeaderTierModal: Component<Props> = (props) => {
         header_value: headerValue().trim(),
         badge_color: badgeColor(),
       };
+      // Validate stream warmup override before any persisting call so an
+      // invalid value cannot leave a partially saved tier behind.
+      const warmupRaw = streamWarmup().trim();
+      let warmupVal: number | null = null;
+      if (warmupRaw !== '') {
+        const parsed = Number(warmupRaw);
+        if (!Number.isInteger(parsed) || parsed < 1000 || parsed > 120000) {
+          throw new Error(
+            'Stream timeout must be a whole number between 1,000 and 120,000 ms, or left blank to inherit.',
+          );
+        }
+        warmupVal = parsed;
+      }
       let saved = editingTier
         ? await updateHeaderTier(props.agentName, editingTier.id, payload)
         : await createHeaderTier(props.agentName, payload);
@@ -185,18 +198,7 @@ const HeaderTierModal: Component<Props> = (props) => {
         saved = await setHeaderTierResponseMode(props.agentName, saved.id, newMode);
       }
       // Persist stream warmup override if changed
-      const warmupRaw = streamWarmup().trim();
-      const warmupVal = warmupRaw === '' ? null : Number(warmupRaw);
-      if (
-        warmupRaw !== '' &&
-        (!Number.isFinite(warmupVal) || warmupVal < 1000 || warmupVal > 120000)
-      ) {
-        throw new Error(
-          'Stream timeout must be between 1,000 and 120,000 ms, or left blank to inherit.',
-        );
-      }
-      const existingWarmup = saved.stream_warmup_ms ?? null;
-      if (warmupVal !== existingWarmup) {
+      if (warmupVal !== (saved.stream_warmup_ms ?? null)) {
         saved = await setHeaderTierStreamWarmup(props.agentName, saved.id, warmupVal);
       }
       props.onSaved(saved);
